@@ -15,6 +15,7 @@ plugins=(
   z
   fzf
   docker
+  zsh-history-substring-search
   zsh-autosuggestions
   zsh-syntax-highlighting
 )
@@ -54,6 +55,13 @@ alias df='df -h'
 alias du='du -h'
 alias ..='cd ..'
 alias ...='cd ../..'
+alias update='sudo apt update && sudo apt upgrade -y'
+alias ports='ss -tulpen'
+alias myip='curl ifconfig.me'
+alias weather='curl wttr.in'
+alias please='sudo $(fc -ln -1)'
+alias cls='clear'
+alias reload='source ~./zshrc'
 
 # FZF nicer defaults (opcional)
 export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
