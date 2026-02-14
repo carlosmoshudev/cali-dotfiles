@@ -1,6 +1,4 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
+# Enable Powerlevel10k instant prompt.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -18,6 +16,13 @@ plugins=(
   zsh-history-substring-search
   zsh-autosuggestions
   zsh-syntax-highlighting
+  colored-man-pages
+  extract
+  command-not-found
+  ssh-agent
+  systemd
+  sudo
+  zsh-interactive-cd
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -28,9 +33,11 @@ source $ZSH/oh-my-zsh.sh
 # --- Quality of life ---
 setopt autocd
 setopt correct
+
 HISTSIZE=20000
 SAVEHIST=20000
 HISTFILE=~/.zsh_history
+
 setopt share_history
 setopt hist_ignore_dups
 setopt hist_reduce_blanks
@@ -61,7 +68,7 @@ alias myip='curl ifconfig.me'
 alias weather='curl wttr.in'
 alias please='sudo $(fc -ln -1)'
 alias cls='clear'
-alias reload='source ~./zshrc'
+alias reload='source ~/.zshrc'
 
 # FZF nicer defaults (opcional)
 export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
