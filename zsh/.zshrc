@@ -1,9 +1,9 @@
-# Enable Powerlevel10k instant prompt.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# --- Oh My Zsh ---
+[[ $- != *i* ]] && return
+
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
@@ -27,10 +27,8 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# --- Powerlevel10k ---
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-# --- Quality of life ---
 setopt autocd
 setopt correct
 
@@ -42,21 +40,12 @@ setopt share_history
 setopt hist_ignore_dups
 setopt hist_reduce_blanks
 
-# --- lsd replaces ls ---
-alias ls='lsd'
-alias ll='lsd -lah'
-alias la='lsd -a'
-alias lt='lsd --tree'
-
-# --- bat replaces cat (Ubuntu a veces es batcat) ---
-if command -v batcat >/dev/null 2>&1; then
-  alias cat='batcat'
-  alias bat='batcat'
-elif command -v bat >/dev/null 2>&1; then
-  alias cat='bat'
-fi
-
-# Extras útiles
+alias ls='lsd --group-dirs=first'
+alias ll='lsd -lah --group-dirs=first'
+alias la='lsd -a --group-dirs=first'
+alias lt='lsd --tree --group-dirs=first'
+alias cat='batcat --paging=never'
+alias bat='batcat'
 alias grep='grep --color=auto'
 alias df='df -h'
 alias du='du -h'
@@ -70,5 +59,7 @@ alias please='sudo $(fc -ln -1)'
 alias cls='clear'
 alias reload='source ~/.zshrc'
 
-# FZF nicer defaults (opcional)
 export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
