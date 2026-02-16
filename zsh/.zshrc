@@ -15,7 +15,6 @@ plugins=(
   docker
   zsh-history-substring-search
   zsh-autosuggestions
-  zsh-syntax-highlighting
   colored-man-pages
   extract
   command-not-found
@@ -23,6 +22,7 @@ plugins=(
   systemd
   sudo
   zsh-interactive-cd
+  zsh-syntax-highlighting
 )
 
 source $ZSH/oh-my-zsh.sh
