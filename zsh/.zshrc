@@ -58,6 +58,7 @@ alias weather='curl wttr.in'
 alias please='sudo $(fc -ln -1)'
 alias cls='clear'
 alias reload='source ~/.zshrc'
+alias composefiles='cd /srv/docker/compose && ls'
 
 export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
 
