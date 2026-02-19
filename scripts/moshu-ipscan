@@ -153,8 +153,8 @@ scan_ports() {
   # -T4 speed; -Pn avoid ping dependency; -n no DNS
   nmap -n -Pn -T4 "${ports_arg[@]}" "$ip" 2>/dev/null \
     | awk '
-        /^PORT/ {in=1; next}
-        in && /^[0-9]+\/(tcp|udp)[[:space:]]+open/ {printf "%s%s", (out?"," : ""), $1; out=1}
+        /^PORT/ {inports=1; next}
+        inports && /^[0-9]+\/(tcp|udp)[[:space:]]+open/ {printf "%s%s", (out?"," : ""), $1; out=1}
         END { if(!out) print "-" ; else print "" }
       '
 }
