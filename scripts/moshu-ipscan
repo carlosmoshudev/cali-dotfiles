@@ -1,0 +1,195 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ---- Config ----
+CIDR="${1:-}"  # optional: 192.168.1.0/24
+IFACE="${IPSCAN_IFACE:-}"  # optional: e.g. enp3s0
+PORTS="${IPSCAN_PORTS:-top}" # "top" or e.g. "22,80,443,445,139,32400,8123,9000,9091"
+USE_API="${IPSCAN_USE_API:-0}" # 1 = enable online vendor lookup for unknown
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/ipscan"
+CACHE_FILE="$CACHE_DIR/vendors.tsv"
+IEEE_OUI_TXT="/usr/share/ieee-data/oui.txt"   # from ieee-data
+IEEE_OUI_CSV="/usr/share/ieee-data/oui.csv"   # on some systems
+
+mkdir -p "$CACHE_DIR"
+touch "$CACHE_FILE"
+
+die() { echo "ipscan: $*" >&2; exit 1; }
+
+need() {
+  command -v "$1" >/dev/null 2>&1 || die "missing dependency: $1"
+}
+
+need arp-scan
+need nmap
+need awk
+need grep
+
+# ---- Vendor lookup helpers ----
+norm_mac() {
+  # normalize MAC to AA:BB:CC:DD:EE:FF uppercase
+  echo "$1" | tr '[:lower:]' '[:upper:]' | sed -E 's/[^0-9A-F]//g' | sed -E 's/(..)(..)(..)(..)(..)(..)/\1:\2:\3:\4:\5:\6/'
+}
+
+oui_prefix() {
+  # return AABBCC (no separators)
+  echo "$1" | tr '[:lower:]' '[:upper:]' | sed -E 's/[^0-9A-F]//g' | cut -c1-6
+}
+
+cache_get_vendor() {
+  local prefix="$1"
+  awk -F'\t' -v p="$prefix" '$1==p {print $2; exit}' "$CACHE_FILE" 2>/dev/null || true
+}
+
+cache_put_vendor() {
+  local prefix="$1" vendor="$2"
+  # avoid duplicates
+  if ! grep -q -F $'\t'"$vendor"$'\n' <<<"$(awk -F'\t' -v p="$prefix" '$1==p {print $2}' "$CACHE_FILE" 2>/dev/null || true)"; then
+    if ! awk -F'\t' -v p="$prefix" '$1==p {found=1} END{exit !found}' "$CACHE_FILE" 2>/dev/null; then
+      printf "%s\t%s\n" "$prefix" "$vendor" >> "$CACHE_FILE"
+    fi
+  fi
+}
+
+lookup_vendor_local_ieee() {
+  local prefix="$1"
+  # Try oui.txt first
+  if [[ -f "$IEEE_OUI_TXT" ]]; then
+    # Format usually: "FC-D7-33   (hex)        Vendor Name"
+    local hit
+    hit="$(grep -i -m1 -E "^${prefix:0:2}[-:]?${prefix:2:2}[-:]?${prefix:4:2}[[:space:]]" "$IEEE_OUI_TXT" 2>/dev/null || true)"
+    if [[ -n "$hit" ]]; then
+      # Take vendor name after "(hex)"
+      echo "$hit" | sed -E 's/.*\) *//'
+      return 0
+    fi
+  fi
+
+  # Try oui.csv (some distros)
+  if [[ -f "$IEEE_OUI_CSV" ]]; then
+    # CSV often: "MA-L","FCD733","Vendor","..."
+    local hit
+    hit="$(awk -F',' -v p="$prefix" '$2 ~ p {gsub(/"/,"",$3); print $3; exit}' "$IEEE_OUI_CSV" 2>/dev/null || true)"
+    if [[ -n "$hit" ]]; then
+      echo "$hit"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+lookup_vendor_api() {
+  # Very lightweight: macvendors.com (plain text) or macvendors.co/json
+  # NOTE: requires internet; you can disable with IPSCAN_USE_API=0
+  need curl
+  local mac="$1"
+  local vendor=""
+  # try plain text endpoint
+  vendor="$(curl -fsS --max-time 2 "https://api.macvendors.com/$mac" 2>/dev/null || true)"
+  if [[ -z "$vendor" ]]; then
+    # try json
+    vendor="$(curl -fsS --max-time 2 "https://macvendors.co/api/$mac" 2>/dev/null \
+      | awk -F'"company":"' 'NF>1{split($2,a,"\""); print a[1]; exit}' || true)"
+  fi
+  echo "$vendor"
+}
+
+resolve_vendor() {
+  local mac_raw="$1" vendor_from_arp="$2"
+  local mac prefix cached vendor
+
+  mac="$(norm_mac "$mac_raw")"
+  prefix="$(oui_prefix "$mac")"
+
+  # If arp-scan already gave a non-empty vendor that's not unknown, use it
+  if [[ -n "${vendor_from_arp// }" ]]; then
+    if ! echo "$vendor_from_arp" | grep -qiE 'unknown|unassigned|not found|incomplete'; then
+      echo "$vendor_from_arp"
+      return 0
+    fi
+  fi
+
+  cached="$(cache_get_vendor "$prefix")"
+  if [[ -n "$cached" ]]; then
+    echo "$cached"
+    return 0
+  fi
+
+  vendor=""
+  if vendor="$(lookup_vendor_local_ieee "$prefix" 2>/dev/null || true)"; then
+    if [[ -n "${vendor// }" ]]; then
+      cache_put_vendor "$prefix" "$vendor"
+      echo "$vendor"
+      return 0
+    fi
+  fi
+
+  if [[ "$USE_API" == "1" ]]; then
+    vendor="$(lookup_vendor_api "$mac" || true)"
+    if [[ -n "${vendor// }" ]]; then
+      cache_put_vendor "$prefix" "$vendor"
+      echo "$vendor"
+      return 0
+    fi
+  fi
+
+  echo "UNKNOWN"
+}
+
+# ---- Port scan helper ----
+scan_ports() {
+  local ip="$1"
+  local ports_arg=()
+
+  if [[ "$PORTS" == "top" ]]; then
+    # top ports = fast-ish, good for "what is this box"
+    ports_arg=(--top-ports 100 --open)
+  else
+    ports_arg=(-p "$PORTS" --open)
+  fi
+
+  # Output just port numbers/protos: "22/tcp,80/tcp"
+  # -T4 speed; -Pn avoid ping dependency; -n no DNS
+  nmap -n -Pn -T4 "${ports_arg[@]}" "$ip" 2>/dev/null \
+    | awk '
+        /^PORT/ {in=1; next}
+        in && /^[0-9]+\/(tcp|udp)[[:space:]]+open/ {printf "%s%s", (out?"," : ""), $1; out=1}
+        END { if(!out) print "-" ; else print "" }
+      '
+}
+
+# ---- Run arp-scan ----
+ARP_ARGS=(--localnet --numeric)
+if [[ -n "$IFACE" ]]; then
+  ARP_ARGS+=(--interface "$IFACE")
+fi
+if [[ -n "$CIDR" ]]; then
+  ARP_ARGS=("$CIDR")
+  if [[ -n "$IFACE" ]]; then
+    ARP_ARGS+=(--interface "$IFACE")
+  fi
+fi
+
+# arp-scan output lines: IP <tab> MAC <tab> Vendor...
+# Filter only valid result lines
+mapfile -t lines < <(sudo arp-scan "${ARP_ARGS[@]}" 2>/dev/null | awk '
+  /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+[ \t]+([0-9A-Fa-f]{2}[:\-]){5}[0-9A-Fa-f]{2}/ {print}
+')
+
+# Header (TSV)
+printf "IP\tMAC\tVENDOR\tPORTS\tHOST\n"
+
+for line in "${lines[@]}"; do
+  ip="$(echo "$line" | awk '{print $1}')"
+  mac="$(echo "$line" | awk '{print $2}')"
+  vend_raw="$(echo "$line" | cut -f3- || true)"
+  vend="$(resolve_vendor "$mac" "$vend_raw")"
+
+  ports="$(scan_ports "$ip" | tr -d '\r')"
+  host="$(getent hosts "$ip" 2>/dev/null | awk '{print $2}' | head -n1 || true)"
+  [[ -z "$host" ]] && host="-"
+
+  printf "%s\t%s\t%s\t%s\t%s\n" "$ip" "$(norm_mac "$mac")" "$vend" "$ports" "$host"
+done \
+| column -t -s $'\t'

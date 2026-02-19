@@ -59,7 +59,7 @@ alias please='sudo $(fc -ln -1)'
 alias cls='clear'
 alias reload='source ~/.zshrc'
 alias composefiles='cd /srv/docker/compose && ls'
-
+alias moshu-ipscan="~/scripts/moshu-ipscan"
 export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
