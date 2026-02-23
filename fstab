@@ -17,7 +17,6 @@ UUID=1b864510-6d75-41af-aade-d50d7a2a29a6  /srv/storage/disk-b     ext4    defau
 # Mapeos desde Disk-A hacia la raíz de /srv para Docker y Samba
 /srv/storage/disk-a/media         /srv/media               none    bind                                                 0      0
 /srv/storage/disk-a/downloads     /srv/downloads           none    bind                                                 0      0
-/srv/storage/disk-a/library       /srv/library             none    bind                                                 0      0
 /srv/storage/disk-a/cloud-drive   /srv/cloud-drive         none    bind                                                 0      0
 /srv/storage/disk-a/backup        /srv/backups/soft        none    bind                                                 0      0
 /srv/storage/disk-b/backup        /srv/backups/hard        none    bind                                                 0      0
