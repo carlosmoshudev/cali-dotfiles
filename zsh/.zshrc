@@ -40,27 +40,7 @@ setopt share_history
 setopt hist_ignore_dups
 setopt hist_reduce_blanks
 
-alias ls='lsd --group-dirs=first'
-alias ll='lsd -lah --group-dirs=first'
-alias la='lsd -a --group-dirs=first'
-alias lt='lsd --tree --group-dirs=first'
-alias cat='batcat --paging=never'
-alias bat='batcat'
-alias grep='grep --color=auto'
-alias df='df -h'
-alias du='du -h'
-alias ..='cd ..'
-alias ...='cd ../..'
-alias update='sudo apt update && sudo apt upgrade -y'
-alias ports='ss -tulpen'
-alias myip='curl ifconfig.me'
-alias weather='curl wttr.in'
-alias please='sudo $(fc -ln -1)'
-alias cls='clear'
-alias reload='source ~/.zshrc'
-alias composefiles='cd /srv/docker/compose && ls'
-alias moshu-ipscan="~/scripts/moshu-ipscan"
-export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+source ~/.dotfiles/zsh/.zshrc_aliases
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
