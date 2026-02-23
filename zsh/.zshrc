@@ -42,5 +42,7 @@ setopt hist_reduce_blanks
 
 source ~/.dotfiles/zsh/.zshrc_aliases
 
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
