@@ -4,55 +4,6 @@ fi
 
 [[ $- != *i* ]] && return
 
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="powerlevel10k/powerlevel10k"
-
-plugins=(
-  git
-  sudo
-  z
-  fzf
-  docker
-  zsh-history-substring-search
-  zsh-autosuggestions
-  colored-man-pages
-  extract
-  command-not-found
-  ssh-agent
-  systemd
-  sudo
-  zsh-interactive-cd
-  zsh-syntax-highlighting
-)
-
-source $ZSH/oh-my-zsh.sh
-
-[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
-
-setopt autocd
-setopt correct
-
-HISTSIZE=20000
-SAVEHIST=20000
-HISTFILE=~/.zsh_history
-
-setopt share_history
-setopt hist_ignore_dups
-setopt hist_reduce_blanks
-
-source ~/.dotfiles/zsh/.zshrc_aliases
-
-export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
-
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
-
-# Created by `pipx` on 2026-03-03 17:34:49
-export PATH="$PATH:/home/gari/.local/bin"
-
-# opencode
-export PATH=/home/gari/.opencode/bin:$PATH
-
-# >>> Codex installer >>>
-export PATH="/home/gari/.local/bin:$PATH"
-# <<< Codex installer <<<
+for init_file in "$HOME/.dotfiles/zsh/init"/*.zsh(N); do
+  source "$init_file"
+done
