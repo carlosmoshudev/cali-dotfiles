@@ -1,0 +1,37 @@
+alias ..='cd .. && ll'
+alias ...='cd ../.. && ll'
+alias ....='cd ../../.. && ll'
+alias .....='cd ../../../.. && ll'
+
+alias composefiles='cd /srv/containers/pro && clear && ll'
+alias srv='cd /srv && clear && ll'
+alias comics='cd /srv/media/comics && clear && ll'
+
+alias ls='lsd --group-dirs=first'
+alias ll='lsd -lah --group-dirs=first'
+alias la='lsd -a --group-dirs=first'
+alias lt='lsd --tree --group-dirs=first'
+
+alias cat='batcat --paging=never'
+alias truecat='/bin/cat'
+alias bat='batcat'
+alias grep='grep --color=auto'
+
+alias df='df -h'
+alias du='du -h'
+
+alias update='sudo apt-get update && sudo apt-get upgrade -y'
+
+alias ports='ss -tulpen'
+alias myip='curl ifconfig.me'
+alias weather='curl wttr.in'
+
+alias please='sudo $(fc -ln -1)'
+
+alias cls='clear'
+alias reload='source ~/.zshrc'
+alias moshu-ipscan="$HOME/scripts/moshu-ipscan"
+
+alias dcu='docker compose up -d'
+alias dcd='docker compose down'
+alias dupg='dcd && docker compose pull && dcu && docker image prune -a -f'
