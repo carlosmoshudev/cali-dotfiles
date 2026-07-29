@@ -1,3 +1,4 @@
+# Firma: cali-dotfiles
 # Small shell helpers that should be available everywhere.
 
 alias cat='batcat --paging=never'

@@ -1,3 +1,4 @@
+# Firma: cali-dotfiles
 # Fast directory jumps and workspace shortcuts.
 
 alias ..='cd .. && ll'

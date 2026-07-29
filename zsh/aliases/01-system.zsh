@@ -1,3 +1,4 @@
+# Firma: cali-dotfiles
 # System, network, maintenance, disk and journal helpers.
 
 alias df='df -h'

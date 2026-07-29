@@ -1,3 +1,4 @@
+# Firma: cali-dotfiles
 # Comics workspace helpers.
 #
 # This file stays silent if the comics workspace is not available on the host.

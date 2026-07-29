@@ -1,3 +1,4 @@
+# Firma: cali-dotfiles
 # Directory listing presets built only on top of lsd.
 
 alias ls='lsd'

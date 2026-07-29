@@ -1,3 +1,4 @@
+# Firma: cali-dotfiles
 # Load every alias fragment in lexical order.
 _load_zsh_aliases() {
   local alias_dir="$HOME/.dotfiles/zsh/aliases"

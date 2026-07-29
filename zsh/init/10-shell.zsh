@@ -1,3 +1,4 @@
+# Firma: cali-dotfiles
 setopt autocd
 setopt correct
 

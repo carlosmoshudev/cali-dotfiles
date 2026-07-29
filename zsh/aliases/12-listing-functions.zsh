@@ -1,3 +1,4 @@
+# Firma: cali-dotfiles
 # Directory listing helper functions built on top of lsd.
 
 lstree() {

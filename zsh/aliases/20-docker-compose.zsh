@@ -1,3 +1,4 @@
+# Firma: cali-dotfiles
 # Docker Compose shortcuts.
 
 alias dcu='docker compose up -d'
@@ -8,8 +9,8 @@ alias dcdu='docker compose down && docker compose up -d'
 alias docker-restart='docker compose down && docker compose up -d'
 alias dcl='docker compose logs -f --tail=100'
 alias docker-logs='docker compose logs -f --tail=100'
-alias dupg='docker compose down && docker compose pull && docker compose up -d && docker image prune -a -f'
-alias docker-upgrade='docker compose down && docker compose pull && docker compose up -d && docker image prune -a -f'
+alias dupg='docker compose pull && docker compose up -d && docker image prune -a -f'
+alias docker-upgrade='docker compose pull && docker compose up -d && docker image prune -a -f'
 alias dlogs='docker compose logs -f --tail=100'
 alias dexec='docker compose exec'
 alias docker-exec='docker compose exec'
