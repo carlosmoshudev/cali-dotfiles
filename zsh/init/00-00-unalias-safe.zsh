@@ -1,4 +1,4 @@
-# Clear common aliases before loading the dotfiles aliases.
+# Clear common aliases before loading anything else.
 # Ignore missing aliases so interactive shells do not spam errors.
 unalias cat bat grep ls l ll la lla l1 l1a lt lt1 lt2 lt3 lta ld ltd \
   lnew lold lbig lext lver lg lgg lperm linode lsize lbytes ltotal \
