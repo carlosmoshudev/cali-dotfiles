@@ -17,6 +17,8 @@ GITSTATUS_DIR'
     os_icon
     context
     vcs
+    virtualenv
+    pyenv
     prompt_char
   )
 
