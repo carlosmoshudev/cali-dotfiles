@@ -1,4 +1,4 @@
-# Directory listing presets built on top of lsd.
+# Directory listing presets built only on top of lsd.
 
 alias ls='lsd'
 alias l='lsd -l'

@@ -2,14 +2,20 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-[[ $- != *i* ]] && return
+[[ $- == *i* ]] || return
 
-unalias_safe_file="$HOME/.dotfiles/zsh/init/00-unalias-safe.zsh"
-if [[ -r "$unalias_safe_file" ]]; then
-  source "$unalias_safe_file"
-fi
+_load_zsh_init() {
+  local init_dir="$HOME/.dotfiles/zsh/init"
+  local unalias_file="$init_dir/00-unalias-safe.zsh"
+  local init_file
 
-for init_file in "$HOME/.dotfiles/zsh/init"/*.zsh(N); do
-  [[ $init_file == "$unalias_safe_file" ]] && continue
-  source "$init_file"
-done
+  [[ -r "$unalias_file" ]] && source "$unalias_file"
+
+  for init_file in "$init_dir"/*.zsh(N); do
+    [[ "$init_file" == "$unalias_file" ]] && continue
+    source "$init_file"
+  done
+}
+
+_load_zsh_init
+unfunction _load_zsh_init

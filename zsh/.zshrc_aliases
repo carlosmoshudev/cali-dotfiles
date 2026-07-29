@@ -1,10 +1,14 @@
 # Load every alias fragment in lexical order.
-# Keep the files small and grouped by concern so the structure stays readable.
+_load_zsh_aliases() {
+  local alias_dir="$HOME/.dotfiles/zsh/aliases"
+  local alias_file
 
-alias_dir="${HOME}/.dotfiles/zsh/aliases"
+  [[ -d "$alias_dir" ]] || return 0
 
-if [[ -d "$alias_dir" ]]; then
   for alias_file in "$alias_dir"/*.zsh(N); do
     source "$alias_file"
   done
-fi
+}
+
+_load_zsh_aliases
+unfunction _load_zsh_aliases
